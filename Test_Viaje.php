@@ -230,21 +230,30 @@ function agregarPasajero() {
         } else {
             $numDocPasajero = readline("Ingrese el numero de documento del pasajero: ");
             $nombrePasajero = readline("Ingrese el Nombre del pasajero: ");
-            $apellidoPasajero  = readline("Ingrese el apellido del pasajero: ");
+            $apellidoPasajero = readline("Ingrese el apellido del pasajero: ");
             $telefonoPasajero = readline("Ingrese el telefono del pasajero: ");
+            $numAsiento = readline("Ingrese el numero de asiento: ");
+            $numTicket = readline("Ingrese el numero de ticket: ");
+
             $nuevoPasajero = new Pasajero();
-            $nuevoPasajero->cargar($numDocPasajero, $nombrePasajero, $apellidoPasajero, $telefonoPasajero, $viaje);
+            $nuevoPasajero->cargar($numDocPasajero, $nombrePasajero, $apellidoPasajero, $telefonoPasajero, null, $numAsiento, $numTicket, $viaje);
+
             if ($nuevoPasajero->Buscar($numDocPasajero)) {
                 echo "Este pasajero ya ha sido cargado\n";
                 return;
             } else {
-                $nuevoPasajero->insertar();
+                if ($nuevoPasajero->insertar()) {
+                    echo "Pasajero agregado exitosamente.\n";
+                } else {
+                    echo "Error al insertar el pasajero: " . $nuevoPasajero->getmensajeoperacion() . "\n";
+                }
             }
         }
     } else {
         echo "No se encontró el viaje que se buscaba.\n";
     }
 }
+
 
 function modificarPasajero() {
     echo "Ingrese el documento del pasajero que desea modificar:\n";

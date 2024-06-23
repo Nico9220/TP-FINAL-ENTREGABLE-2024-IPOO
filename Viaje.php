@@ -270,8 +270,6 @@ class Viaje
 		return $resp;
 	}
 	
-	
-	
 	public function modificar(){
         $resp =false; 
         $base=new BaseDatos();

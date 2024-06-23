@@ -14,7 +14,7 @@ class Pasajero extends Persona
         $this->idPasajero ="";
         $this->numAsiento = "";
         $this->numTicket = "";
-        $this->objViaje = null;
+        $this->objViaje = [];
     }
 	public function cargar($nroDoc, $nombre, $apellido, $telefono, $idPasajero = null, $numAsiento = null, $numTicket = null, $objetoViaje = null) {
         parent::cargar($nroDoc, $nombre, $apellido, $telefono);
@@ -72,6 +72,11 @@ class Pasajero extends Persona
 				    $this->setNumAsiento($row2['numasiento']);
                     $this->setNumTicket($row2['numticket']);
                     $this->setObjViaje($row2['idviaje']); 
+
+					// Creo obj Viaje
+					$objViaje = new Viaje();
+					$objViaje->Buscar($row2['idviaje']);
+					$this->setObjViaje($objViaje);
 					$resp= true;
 				}				
 			
@@ -112,26 +117,31 @@ class Pasajero extends Persona
 		 return $arreglo;
 	}	
 	public function insertar() {
-        $base = new BaseDatos();
-        $resp = false;
-
-        if (parent::insertar()) {
-            $consultaInsertar = "INSERT INTO pasajero(idpasajero, pdocumento, numasiento, numticket, idviaje)
-                VALUES (" . $this->getIdPasajero() . ", " . $this->getNrodoc() . ", " . $this->getNumAsiento() . ", " . $this->getNumTicket() . ", " . $this->getObjViaje()->getCodigo() . ")";
-
-            if ($base->Iniciar()) {
-                if ($base->Ejecutar($consultaInsertar)) {
-                    $resp = true;
-                } else {
-                    $this->setmensajeoperacion($base->getError());
-                }
-            } else {
-                $this->setmensajeoperacion($base->getError());
+		$base = new BaseDatos();
+		$resp = false;
+	
+		if (parent::insertar()) {
+			if ($this->getObjViaje() !== null) {
+				$consultaInsertar = "INSERT INTO pasajero(idpasajero, pdocumento, numasiento, numticket, idviaje)
+					VALUES (" . $this->getIdPasajero() . ", " . $this->getNrodoc() . ", " . $this->getNumAsiento() . ", " . $this->getNumTicket() . ", " . $this->getObjViaje()->getCodigo() . ")";
+	
+				if ($base->Iniciar()) {
+					if ($base->Ejecutar($consultaInsertar)) {
+						$resp = true;
+					} else {
+						$this->setmensajeoperacion($base->getError());
+					}
+				} else {
+					$this->setmensajeoperacion($base->getError());
+				}
+			} else {
+				$this->setmensajeoperacion($base->getError());
 			}
-        }
-
-        return $resp;
-    }
+		}
+	
+		return $resp;
+	}
+	
 
 	
 	
