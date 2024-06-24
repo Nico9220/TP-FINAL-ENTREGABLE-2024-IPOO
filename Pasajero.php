@@ -133,7 +133,7 @@ class Pasajero extends Persona
 				
 				$consultaInsertar = "INSERT INTO pasajero(pdocumento, numasiento, numticket, idviaje)
 					VALUES ($nroDoc, $numAsiento, $numTicket, $idViaje)";
-	
+
 				if ($base->Iniciar()) {
 					if ($base->Ejecutar($consultaInsertar)) {
 						$resp = true;
