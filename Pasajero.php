@@ -14,7 +14,7 @@ class Pasajero extends Persona
         $this->idPasajero ="";
         $this->numAsiento = "";
         $this->numTicket = "";
-        $this->objViaje = [];
+        $this->objViaje = null;
     }
 	public function cargar($nroDoc, $nombre, $apellido, $telefono, $idPasajero = null, $numAsiento = null, $numTicket = null, $objetoViaje = null) {
         parent::cargar($nroDoc, $nombre, $apellido, $telefono);
@@ -116,14 +116,23 @@ class Pasajero extends Persona
 		 }	
 		 return $arreglo;
 	}	
+
 	public function insertar() {
 		$base = new BaseDatos();
 		$resp = false;
 	
 		if (parent::insertar()) {
-			if ($this->getObjViaje() !== null) {
-				$consultaInsertar = "INSERT INTO pasajero(idpasajero, pdocumento, numasiento, numticket, idviaje)
-					VALUES (" . $this->getIdPasajero() . ", " . $this->getNrodoc() . ", " . $this->getNumAsiento() . ", " . $this->getNumTicket() . ", " . $this->getObjViaje()->getCodigo() . ")";
+			$objViaje = $this->getObjViaje();
+			
+			if ($objViaje !== null) {
+				// Asume que idPasajero es auto increment y no lo incluimos en la consulta.
+				$nroDoc = $this->getNrodoc();
+				$numAsiento = $this->getNumAsiento();
+				$numTicket = $this->getNumTicket();
+				$idViaje = $objViaje->getCodigo();
+				
+				$consultaInsertar = "INSERT INTO pasajero(pdocumento, numasiento, numticket, idviaje)
+					VALUES ($nroDoc, $numAsiento, $numTicket, $idViaje)";
 	
 				if ($base->Iniciar()) {
 					if ($base->Ejecutar($consultaInsertar)) {
@@ -142,27 +151,34 @@ class Pasajero extends Persona
 		return $resp;
 	}
 	
-
-	
 	
 	public function modificar(){
-	    $resp =false; 
-	    $base=new BaseDatos();
-	    if(parent::modificar()){
-	        $consultaModifica="UPDATE pasajero SET numasiento=".$this->getNumAsiento().", numticket = ". $this->getNumTicket(). ", idviaje=".$this->getObjViaje()." WHERE pdocumento=". $this->getNrodoc(); 
-	        if($base->Iniciar()){
-	            if($base->Ejecutar($consultaModifica)){
-	                $resp=  true;
-	            }else{
-	                $this->setmensajeoperacion($base->getError());
-	                
-	            }
-	        }else{
-	            $this->setmensajeoperacion($base->getError());
-	            
-	        }
-	    }
-		
+		$resp = false; 
+		$base = new BaseDatos();
+		if (parent::modificar()) {
+			$objViaje = $this->getObjViaje();
+			if ($objViaje !== null) {
+				$idViaje = $objViaje->getCodigo();
+			} else {
+				$idViaje = "NULL"; // Asume que es nullable en la base de datos
+			}
+			$consultaModifica = "UPDATE pasajero SET 
+				numasiento = " . $this->getNumAsiento() . ", 
+				numticket = " . $this->getNumTicket() . ", 
+				idviaje = " . $idViaje . " 
+				WHERE pdocumento = " . $this->getNrodoc();
+	
+			if ($base->Iniciar()) {
+				if ($base->Ejecutar($consultaModifica)) {
+					$resp = true;
+				} else {
+					$this->setmensajeoperacion($base->getError());
+				}
+			} else {
+				$this->setmensajeoperacion($base->getError());
+			}
+		}
+	
 		return $resp;
 	}
 	

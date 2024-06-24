@@ -222,8 +222,10 @@ function agregarPasajero() {
     $viaje = new Viaje();
     echo "Ingrese el id del viaje:\n";
     $id = trim(fgets(STDIN));
+
     if ($viaje->Buscar($id)) {
         echo $viaje;
+
         if (!$viaje->hayPasajesDisponibles()) {
             echo "No hay pasajes disponibles\n";
             return;
@@ -234,6 +236,11 @@ function agregarPasajero() {
             $telefonoPasajero = readline("Ingrese el telefono del pasajero: ");
             $numAsiento = readline("Ingrese el numero de asiento: ");
             $numTicket = readline("Ingrese el numero de ticket: ");
+
+            if (empty($numDocPasajero) || empty($nombrePasajero) || empty($apellidoPasajero) || empty($telefonoPasajero) || empty($numAsiento) || empty($numTicket)) {
+                echo "Todos los campos son obligatorios.\n";
+                return;
+            }
 
             $nuevoPasajero = new Pasajero();
             $nuevoPasajero->cargar($numDocPasajero, $nombrePasajero, $apellidoPasajero, $telefonoPasajero, null, $numAsiento, $numTicket, $viaje);
@@ -292,7 +299,11 @@ function modificarPasajero() {
             echo "Opción inválida. Por favor, seleccione una opción válida.\n";
             return;
     }
-    $pasajero->modificar();
+    if ($pasajero->modificar()) {
+        echo "Pasajero modificado exitosamente.\n";
+    } else {
+        echo "Error al modificar el pasajero: " . $pasajero->getmensajeoperacion() . "\n";
+    }
 }
 
 function eliminarPasajero() {
